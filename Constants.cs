@@ -14,7 +14,7 @@ namespace LacExporter
         public static string GetGitHubCardsRepoUrl(string branch = DefaultBranchName) => string.Format(GitHubCardsRepoUrl, branch);
         public static string GetGitHubSetsRepoUrl(string branch = DefaultBranchName) => string.Format(GitHubSetsRepoUrl, branch);
 
-        public static string[] Sets = ["WTR", "ARC", "CRU", "MON", "ELE", "EVR", "UPR", "DYN", "OUT", "DTD", "EVO", "HVY", "MST", "ROS"];
-        public static string[] IgnoredSets = ["HER", "JDG", "FAB", "LSS", "LGS", "OXO", "1HP", "WIN"];
+        public static string[] Sets = ["WTR", "ARC", "CRU", "MON", "ELE", "EVR", "UPR", "DYN", "OUT", "DTD", "EVO", "HVY", "MST", "ROS", "TER"];
+        public static string[] IgnoredSets = ["HER", "JDG", "FAB", "LSS", "LGS", "OXO", "1HP", "WIN", "XXX", "1HB", "1HD", "1HT", "1HK", "1HR", "1HV"];
     }
 }
