@@ -1,37 +1,36 @@
 using System.Text.Json;
-using LacExporter.Models.Dtos;
+using Exporter.Models.Dtos;
 
-namespace LacExporter.Services
+namespace Exporter.Services;
+
+public class HttpService
 {
-    public class HttpService
+    private readonly HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public HttpService(IHttpClientFactory httpClientFactory)
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly HttpClient _httpClient;
+        _httpClientFactory = httpClientFactory;
+        _httpClient = _httpClientFactory.CreateClient();
+    }
 
-        public HttpService(IHttpClientFactory httpClientFactory)
-        {
-            _httpClientFactory = httpClientFactory;
-            _httpClient = _httpClientFactory.CreateClient();
-        }
+    public async Task<List<CardDto>> GetCardsAsync(string branchName = "")
+    {
+        var response = await _httpClient.GetAsync(Constants.GetGitHubCardsRepoUrl(branchName));
 
-        public async Task<List<CardDto>> GetCardsAsync(string branchName = "")
-        {
-            var response = await _httpClient.GetAsync(Constants.GetGitHubCardsRepoUrl(branchName));
+        if (!response.IsSuccessStatusCode)
+            throw new Exception("An Http error occurred.");
 
-            if (!response.IsSuccessStatusCode)
-                throw new Exception("An Http error occurred.");
+        return JsonSerializer.Deserialize<List<CardDto>>(await response.Content.ReadAsStringAsync())!;
+    }
 
-            return JsonSerializer.Deserialize<List<CardDto>>(await response.Content.ReadAsStringAsync())!;
-        }
+    public async Task<List<SetDto>> GetSetsAsync(string branchName = "")
+    {
+        var response = await _httpClient.GetAsync(Constants.GetGitHubSetsRepoUrl(branchName));
 
-        public async Task<List<SetDto>> GetSetsAsync(string branchName = "")
-        {
-            var response = await _httpClient.GetAsync(Constants.GetGitHubSetsRepoUrl(branchName));
+        if (!response.IsSuccessStatusCode)
+            throw new Exception("An Http error occurred.");
 
-            if (!response.IsSuccessStatusCode)
-                throw new Exception("An Http error occurred.");
-
-            return JsonSerializer.Deserialize<List<SetDto>>(await response.Content.ReadAsStringAsync())!;
-        }
+        return JsonSerializer.Deserialize<List<SetDto>>(await response.Content.ReadAsStringAsync())!;
     }
 }
