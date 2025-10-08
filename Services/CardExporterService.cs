@@ -11,6 +11,8 @@ public class ExportService(HttpService httpService)
 
     public async Task Export(Options options)
     {
+
+        options.Class = "Guardian";
         var cardsDto = await httpService.GetCardsAsync(options.GetBranchName());
         var sets = await GetSets(options.GetBranchName());
         
@@ -40,12 +42,14 @@ public class ExportService(HttpService httpService)
         var setsDto = await httpService.GetSetsAsync(branchName);
 
         var sets = setsDto
-            .Where(x => !Constants.IgnoredSets.Contains(x.Id))
+            .Where(x => !Constants.IgnoredSets.Contains(x.Id) && 
+                        x.Printings.All(p => !string.IsNullOrWhiteSpace(p.InitialReleaseDate))
+                        && !(x.Name.Contains("Blitz") || x.Name.Contains("Hero")))
             .Select(x => new Set
             {
                 Id = x.Id,
                 Name = x.Name,
-                InitialReleaseDate = DateTime.TryParse(x.Printings.FirstOrDefault().InitialReleaseDate, out var releaseDate) ? releaseDate : DateTime.MinValue,
+                InitialReleaseDate = DateTime.Parse(x.Printings.FirstOrDefault()!.InitialReleaseDate)
             });
 
         return sets.OrderBy(x => x.InitialReleaseDate).Select(x => x.Id).ToArray();
