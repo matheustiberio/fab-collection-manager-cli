@@ -11,8 +11,6 @@ public class ExportService(HttpService httpService)
 
     public async Task Export(Options options)
     {
-
-        options.Class = "Guardian";
         var cardsDto = await httpService.GetCardsAsync(options.GetBranchName());
         var sets = await GetSets(options.GetBranchName());
         
