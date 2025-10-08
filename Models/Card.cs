@@ -64,32 +64,29 @@ public class Card
         if (Array.IndexOf(CardKeywords, "Meld") != -1)
             return $"{Types[2]} {Types[0]}";
 
-        if (Types.Length > 3)
-            return $"{Types[0]} {Types[1]}";
+        if (Types.Length >= 3) // some cards have three types where the third type is not a class
+        {
+            if (Constants.Classes.Contains(Types[1]))
+                return $"{Types[0]} {Types[1]}";
+        }
 
         return $"{Types[0]}";
     }
 
-    /// <summary>
-    ///     This method sets the type of the card to be used for calculation of play set
-    ///     Example: A card with type empty is a normal card, we want a play set of 3, but a Legendary (keyword), we want just
-    ///     one
-    /// </summary>
-    /// <returns></returns>
-    public string GetRegisterCardType()
+    public string GetPlayset()
     {
         if (Types.Contains("1H"))
-            return "1HW";
+            return "2";
 
         if (Types.Contains("2H"))
-            return "2HW";
+            return "1";
 
         if (CardKeywords.Contains("Legendary") || Types.Contains("Gem"))
-            return "LEGD";
+            return "1";
 
         if (Types.Contains("Equipment"))
-            return "EQUIP";
+            return "1";
 
-        return string.Empty;
+        return "3";
     }
 }

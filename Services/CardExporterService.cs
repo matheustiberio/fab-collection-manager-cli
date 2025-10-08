@@ -13,7 +13,7 @@ public class ExportService(HttpService httpService)
     {
         var cardsDto = await httpService.GetCardsAsync(options.GetBranchName());
         var sets = await GetSets(options.GetBranchName());
-
+        
         if (options.IsItToFilterBySetAndClass)
         {
             var cards = FilterBySetAndClass(cardsDto, options.Set, options.Class);
@@ -39,12 +39,13 @@ public class ExportService(HttpService httpService)
     {
         var setsDto = await httpService.GetSetsAsync(branchName);
 
-        var sets = setsDto.Where(x => !Constants.IgnoredSets.Contains(x.Id) && Constants.Sets.Contains(x.Id))
+        var sets = setsDto
+            .Where(x => !Constants.IgnoredSets.Contains(x.Id))
             .Select(x => new Set
             {
                 Id = x.Id,
                 Name = x.Name,
-                InitialReleaseDate = DateTime.Parse(x.Printings.FirstOrDefault()!.InitialReleaseDate)
+                InitialReleaseDate = DateTime.TryParse(x.Printings.FirstOrDefault().InitialReleaseDate, out var releaseDate) ? releaseDate : DateTime.MinValue,
             });
 
         return sets.OrderBy(x => x.InitialReleaseDate).Select(x => x.Id).ToArray();
@@ -53,8 +54,13 @@ public class ExportService(HttpService httpService)
     private void BuildCardsFromClassExportToClipboard(IEnumerable<Card> cards)
     {
         foreach (var card in cards)
-            _stringBuilder.Append(string.Format(Constants.ClassExportColumns, card.Name, card.Pitch, card.Rarity,
-                card.Type, card.GetRegisterCardType(), card.CardId));
+            _stringBuilder.Append(string.Format(Constants.ClassExportColumns, 
+                card.Name, 
+                card.Pitch, 
+                card.Rarity,
+                card.Type, 
+                card.GetPlayset(), 
+                card.CardId));
     }
 
     private void BuildCardsFromSetExportToClipboard(IEnumerable<Card> cards)
